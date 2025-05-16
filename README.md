@@ -14,7 +14,7 @@ This project demonstrates how to:
 ### 🧪 Technologies
 - AWS Fargate for Amazon ECS
 - Amazon MSK
-- Confluent Schema Registry (open source Docker image)
+- Confluent Schema Registry
 - Python
 
 ### 🚀 Quick Start
