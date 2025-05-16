@@ -1,7 +1,7 @@
 # Confluent schema registry integration with Amazon MSK
 
 This project demonstrates how to:
-- Deploy **Confluent Schema Registry** on **Amazon ECS Fargate**
+- Deploy [**Confluent Schema Registry**](https://github.com/confluentinc/schema-registry) on **Amazon ECS Fargate**
 - Integrate it with **Amazon MSK** (Plaintext authentication)
 - Produce and consume **Avro-encoded** Kafka messages using **Python**
 
