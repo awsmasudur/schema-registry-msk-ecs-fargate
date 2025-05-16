@@ -23,6 +23,7 @@ This project demonstrates how to:
 3. Send and read Avro messages
 
 
+** Make sure the subnet you are choosing has internet access to download the Docker image.
 ---
 
 
