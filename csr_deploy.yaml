@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy Confluent Schema Registry on ECS Fargate with public IP and existing security group -v5
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC to deploy into
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: At least one public subnet for Fargate task
+
+  ExistingSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Existing Security Group ID to attach to Fargate task
+
+Resources:
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: schema-registry-cluster
+
+  SchemaRegistryTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  SchemaRegistryTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '512'
+      Memory: '1024'
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt SchemaRegistryTaskRole.Arn
+      ContainerDefinitions:
+        - Name: schema-registry
+          Image: confluentinc/cp-schema-registry:latest
+          PortMappings:
+            - ContainerPort: 8081
+          Environment:
+            - Name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
+              Value: PLAINTEXT://BOOTSTRAPSERVERS:9092
+            - Name: SCHEMA_REGISTRY_HOST_NAME
+              Value: schema-registry
+            - Name: SCHEMA_REGISTRY_LISTENERS
+              Value: http://0.0.0.0:8081
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/schema-registry
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+
+  SchemaRegistryLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/schema-registry
+      RetentionInDays: 7
+
+  SchemaRegistryService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      TaskDefinition: !Ref SchemaRegistryTaskDef
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: [!Ref ExistingSecurityGroupId]
+          Subnets: !Ref SubnetIds
+
+Outputs:
+  Note:
+    Description: The public IP of the task is assigned dynamically and cannot be output via CloudFormation. Use ECS Console or AWS CLI to find it.
+    Value: "Run 'aws ecs describe-tasks' after deployment to get the public IP."
