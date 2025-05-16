@@ -25,6 +25,5 @@ This project demonstrates how to:
 
 *Make sure the subnet you are choosing has internet access to download the Docker image.*
 *Update the BOOTSTRAPSERVERS url before deploying the CloudFormation template*
----
 
 
