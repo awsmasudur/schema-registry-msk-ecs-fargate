@@ -21,9 +21,7 @@ This project demonstrates how to:
 1. Deploy the CloudFormation stack
 2. Update the producer and consumer scripts with your MSK cluster bootstrap url and Schema Registry endpoints
 3. Send and read Avro messages
-
-
-* Make sure the subnet you are choosing has internet access to download the Docker image.*
-* Update the BOOTSTRAPSERVERS url before deploying the CloudFormation template*
+4. Make sure the subnet you are choosing has internet access to download the Docker image
+5. Update the BOOTSTRAPSERVERS url before deploying the CloudFormation template
 
 
